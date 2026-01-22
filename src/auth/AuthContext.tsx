@@ -32,6 +32,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       setUser(res.data);
     } catch {
       setUser(null);
+      await api.post("/auth/logout/").catch(() => {});
     }
   }
 
