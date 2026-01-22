@@ -1,20 +1,56 @@
 import { Route, Routes } from "react-router-dom";
-import Dashboard from "./pages/Dashboard";
+import Dashboard from "@/pages/Dashboard";
 import TransactionsPage from "@/pages/Transactions";
-import CategoryPage from "./pages/Category";
+import CategoryPage from "@/pages/Category";
 import { Header } from "./@shared/Header/Header";
+import LoginPage from "@/pages/Login";
+import RequireAuth from "@/auth/RequireAuth";
 
 function App() {
   return (
-    <div className="border border-amber-500">
-      <Header />
+    <Routes>
+      {/* pública */}
+      <Route path="/login" element={<LoginPage />} />
 
-      <Routes>
-        <Route path="/" element={<Dashboard />} />
-        <Route path="/transactions" element={<TransactionsPage />} />
-        <Route path="/categories" element={<CategoryPage />} />
-      </Routes>
-    </div>
+      {/* privadas */}
+      <Route element={<RequireAuth />}>
+        <Route
+          path="/"
+          element={
+            <div className="min-h-screen">
+              <Header />
+              <div className="mx-auto max-w-6xl px-4 py-4">
+                <Dashboard />
+              </div>
+            </div>
+          }
+        />
+
+        <Route
+          path="/transactions"
+          element={
+            <div className="min-h-screen">
+              <Header />
+              <div className="mx-auto max-w-6xl px-4 py-4">
+                <TransactionsPage />
+              </div>
+            </div>
+          }
+        />
+
+        <Route
+          path="/categories"
+          element={
+            <div className="min-h-screen">
+              <Header />
+              <div className="mx-auto max-w-6xl px-4 py-4">
+                <CategoryPage />
+              </div>
+            </div>
+          }
+        />
+      </Route>
+    </Routes>
   );
 }
 
