@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { api } from "@/services/api";
 import type { Summary, Transaction } from "@/@types/types";
 import EmptyState from "../components/EmptyState";
-import Badge from "@/components/badge";
+import Badge from "@/components/Badge";
 
 function ymNow() {
   const d = new Date();
@@ -59,21 +59,14 @@ export default function Dashboard() {
   }, [topOutCategories]);
 
   return (
-    <div style={{ display: "grid", gap: 12 }}>
-      <section
-        style={{
-          display: "flex",
-          justifyContent: "space-between",
-          gap: 12,
-          alignItems: "center",
-        }}
-      >
+    <div className="p-2 m-auto">
+      <section className="flex justify-between items-center gap-6">
         <div>
-          <h2 style={{ margin: 0 }}>Dashboard</h2>
-          <div style={{ color: "#666" }}>Resumo do mês</div>
+          <h2 className="m-0">Dashboard</h2>
+          <div className="text-gray-600">Resumo do mês</div>
         </div>
 
-        <label style={{ display: "flex", gap: 8, alignItems: "center" }}>
+        <label className="flex gap-4 items-center">
           <span>Mês</span>
           <input
             type="month"

@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { api } from "@/services/api";
 import type { Category, Transaction, TxType } from "@/@types/types";
-import Badge from "@/components/badge";
+import Badge from "@/components/Badge";
 import EmptyState from "@/components/EmptyState";
 import CreateCategoryModal from "@/components/Modals/CreateCategoryModal";
 import ConfirmDialog from "@/components/Modals/ConfirmDialog";
@@ -137,15 +137,8 @@ export default function TransactionsPage() {
   }
 
   return (
-    <div style={{ display: "grid", gap: 12 }}>
-      <section
-        style={{
-          display: "flex",
-          justifyContent: "space-between",
-          gap: 12,
-          alignItems: "center",
-        }}
-      >
+    <div className="h-[200px] p-2">
+      <section className="flex justify-between items-center gap-5">
         <div>
           <h2 style={{ margin: 0 }}>Transações</h2>
           <div style={{ color: "#666" }}>
@@ -291,11 +284,6 @@ export default function TransactionsPage() {
             <button style={btnPrimary} type="submit">
               Salvar
             </button>
-
-            <small style={{ color: "#666" }}>
-              💡 Se quiser, eu também te passo um endpoint pra “categoria padrão
-              = Outros”.
-            </small>
           </form>
         </div>
 
@@ -403,6 +391,8 @@ const panel: React.CSSProperties = {
   borderRadius: 12,
   padding: 12,
   background: "white",
+  overflowY: "auto",
+  height: "100%",
 };
 
 const row: React.CSSProperties = {
