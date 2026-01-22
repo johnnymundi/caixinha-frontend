@@ -144,7 +144,7 @@ export default function CategoryPage({
           ) : (
             <>
               <Separator className="mb-3" />
-              <ScrollArea className="h-[520px] pr-2">
+              <ScrollArea className="h-130 pr-2">
                 <div className="space-y-2">
                   {cats.map((c) => (
                     <div
