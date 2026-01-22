@@ -3,6 +3,11 @@ import { api } from "@/services/api";
 import { toast } from "sonner";
 import { useNavigate } from "react-router-dom";
 
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Button } from "@/components/ui/button";
+
 export default function RegisterPage() {
   const nav = useNavigate();
   const [username, setUsername] = useState("");
@@ -42,70 +47,76 @@ export default function RegisterPage() {
 
   return (
     <div className="min-h-screen grid place-items-center bg-background px-4">
-      <form
-        onSubmit={onSubmit}
-        className="w-full max-w-md rounded-xl border bg-white p-6 shadow-sm space-y-4"
-      >
-        <div className="space-y-1">
-          <h1 className="text-2xl font-semibold">Criar conta</h1>
-          <p className="text-sm text-gray-500">
+      <Card className="w-full max-w-md">
+        <CardHeader className="space-y-1">
+          <CardTitle className="text-2xl font-semibold tracking-tight">
+            Criar conta
+          </CardTitle>
+          <p className="text-sm text-muted-foreground">
             Use um email válido para recuperar sua senha.
           </p>
-        </div>
+        </CardHeader>
 
-        <div className="space-y-2">
-          <label className="text-sm font-medium">Username</label>
-          <input
-            className="w-full rounded-lg border px-3 py-2"
-            value={username}
-            onChange={(e) => setUsername(e.target.value)}
-          />
-        </div>
+        <CardContent>
+          <form onSubmit={onSubmit} className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="username">Username</Label>
+              <Input
+                id="username"
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
+                autoComplete="username"
+              />
+            </div>
 
-        <div className="space-y-2">
-          <label className="text-sm font-medium">Email</label>
-          <input
-            className="w-full rounded-lg border px-3 py-2"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-          />
-        </div>
+            <div className="space-y-2">
+              <Label htmlFor="email">Email</Label>
+              <Input
+                id="email"
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                autoComplete="email"
+              />
+            </div>
 
-        <div className="space-y-2">
-          <label className="text-sm font-medium">Senha</label>
-          <input
-            type="password"
-            className="w-full rounded-lg border px-3 py-2"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-          />
-        </div>
+            <div className="space-y-2">
+              <Label htmlFor="password">Senha</Label>
+              <Input
+                id="password"
+                type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                autoComplete="new-password"
+              />
+            </div>
 
-        <div className="space-y-2">
-          <label className="text-sm font-medium">Confirmar senha</label>
-          <input
-            type="password"
-            className="w-full rounded-lg border px-3 py-2"
-            value={password2}
-            onChange={(e) => setPassword2(e.target.value)}
-          />
-        </div>
+            <div className="space-y-2">
+              <Label htmlFor="password2">Confirmar senha</Label>
+              <Input
+                id="password2"
+                type="password"
+                value={password2}
+                onChange={(e) => setPassword2(e.target.value)}
+                autoComplete="new-password"
+              />
+            </div>
 
-        <button
-          disabled={busy}
-          className="w-full rounded-lg bg-black text-white py-2 font-medium disabled:opacity-60"
-        >
-          {busy ? "Criando…" : "Criar conta"}
-        </button>
+            <Button disabled={busy} className="w-full rounded-lg">
+              {busy ? "Criando…" : "Criar conta"}
+            </Button>
 
-        <button
-          type="button"
-          onClick={() => nav("/login")}
-          className="w-full rounded-lg border py-2 text-sm"
-        >
-          Voltar pro login
-        </button>
-      </form>
+            <Button
+              type="button"
+              variant="outline"
+              className="w-full rounded-lg"
+              onClick={() => nav("/login")}
+            >
+              Voltar pro login
+            </Button>
+          </form>
+        </CardContent>
+      </Card>
     </div>
   );
 }

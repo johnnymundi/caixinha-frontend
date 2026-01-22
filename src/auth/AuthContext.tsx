@@ -1,5 +1,5 @@
 import { createContext, useContext, useEffect, useMemo, useState } from "react";
-import { api, applyToken } from "@/services/api";
+import { api, applyRefreshToken, applyToken } from "@/services/api";
 import { toast } from "sonner";
 
 type User = {
@@ -8,7 +8,8 @@ type User = {
   username: string;
   first_name?: string | null;
   last_name?: string | null;
-  access: string;
+  access?: string;
+  refresh?: string;
 };
 
 type AuthContextType = {
@@ -44,11 +45,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   async function login(email: string, password: string) {
     try {
-      const res = await api.post<{ user: User }>("/auth/login/", {
+      const res = await api.post<{
+        user: User;
+        access: string;
+        refresh: string;
+      }>("/auth/login/", {
         email,
         password,
       });
       applyToken(res.data.access);
+      applyRefreshToken(res.data.refresh);
       setUser(res.data.user);
       toast.success("Bem-vindo!");
     } catch (e: any) {

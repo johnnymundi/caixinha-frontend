@@ -1,42 +1,14 @@
 import { useEffect, useState } from "react";
 import { api } from "@/services/api";
-import type { Category } from "@/@types//types";
+import type { Category } from "@/@types/types";
 import CreateCategoryModal from "@/components/Modals/CreateCategoryModal";
 import ConfirmDialog from "@/components/Modals/ConfirmDialog";
 import { toast } from "sonner";
 
-const panel: React.CSSProperties = {
-  border: "1px solid #eee",
-  borderRadius: 12,
-  padding: 12,
-  background: "white",
-};
-
-const row: React.CSSProperties = {
-  display: "flex",
-  justifyContent: "space-between",
-  alignItems: "center",
-  gap: 12,
-  border: "1px solid #f0f0f0",
-  borderRadius: 12,
-  padding: 12,
-  background: "#fff",
-};
-
-const btn: React.CSSProperties = {
-  padding: "10px 12px",
-  borderRadius: 10,
-  border: "1px solid #e5e5e5",
-  background: "#fff",
-  cursor: "pointer",
-};
-
-const btnDanger: React.CSSProperties = {
-  ...btn,
-  border: "1px solid #111",
-  background: "#111",
-  color: "#fff",
-};
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { Separator } from "@/components/ui/separator";
 
 function unwrapResults<T>(data: any): T[] {
   return Array.isArray(data) ? data : (data?.results ?? []);
@@ -96,14 +68,14 @@ export default function CategoryPage({
       toast.error("Não é possível excluir!", {
         description: "A categoria 'Outros' não pode ser removida.",
       });
-    } else {
-      setCatToDelete(c);
-      setConfirmOpen(true);
+      return;
     }
+    setCatToDelete(c);
+    setConfirmOpen(true);
   };
 
   return (
-    <div style={panel} className="p-2">
+    <div className="space-y-4">
       <CreateCategoryModal
         open={createOpen}
         onClose={() => setCreateOpen(false)}
@@ -135,66 +107,91 @@ export default function CategoryPage({
         busy={deleting}
       />
 
-      <div
-        style={{
-          display: "flex",
-          justifyContent: "space-between",
-          gap: 12,
-          alignItems: "center",
-        }}
-      >
-        <h3 style={{ margin: 0 }}>Categorias</h3>
-        <button style={btn} onClick={() => setCreateOpen(true)}>
-          + Categoria
-        </button>
-      </div>
+      <Card>
+        <CardHeader className="pb-3">
+          <div className="flex items-center justify-between gap-3">
+            <CardTitle className="text-base">Categorias</CardTitle>
 
-      <div style={{ marginTop: 10 }}>
-        {loading ? (
-          <div style={{ color: "#666" }}>Carregando…</div>
-        ) : cats.length === 0 ? (
-          <div style={{ color: "#666" }}>Sem categorias ainda.</div>
-        ) : (
-          <div style={{ display: "grid", gap: 8 }}>
-            {cats.map((c) => (
-              <div key={c.id} style={row}>
-                <div style={{ display: "grid" }}>
-                  <b>{c.name}</b>
-                  <span style={{ color: "#666", fontSize: 12 }}>
-                    ID: {c.id}
-                  </span>
-                </div>
+            <div className="flex items-center gap-2">
+              <Button
+                type="button"
+                variant="outline"
+                className="rounded-lg"
+                onClick={() => setCreateOpen(true)}
+              >
+                + Categoria
+              </Button>
 
-                <div style={{ display: "flex", gap: 8 }}>
-                  {onSelectCategoryId ? (
-                    <button
-                      style={btn}
-                      onClick={() => {
-                        onSelectCategoryId(c.id);
-                        toast.info("Categoria selecionada", {
-                          description: c.name,
-                        });
-                      }}
-                    >
-                      Usar
-                    </button>
-                  ) : null}
-
-                  <button style={btnDanger} onClick={() => handleDelete(c)}>
-                    Excluir
-                  </button>
-                </div>
-              </div>
-            ))}
+              <Button
+                type="button"
+                variant="outline"
+                className="rounded-lg"
+                onClick={load}
+              >
+                Recarregar
+              </Button>
+            </div>
           </div>
-        )}
-      </div>
+        </CardHeader>
 
-      <div style={{ marginTop: 10 }}>
-        <button style={btn} onClick={load}>
-          Recarregar
-        </button>
-      </div>
+        <CardContent>
+          {loading ? (
+            <div className="text-sm text-muted-foreground">Carregando…</div>
+          ) : cats.length === 0 ? (
+            <div className="text-sm text-muted-foreground">
+              Sem categorias ainda.
+            </div>
+          ) : (
+            <>
+              <Separator className="mb-3" />
+              <ScrollArea className="h-[520px] pr-2">
+                <div className="space-y-2">
+                  {cats.map((c) => (
+                    <div
+                      key={c.id}
+                      className="flex items-center justify-between gap-3 rounded-xl border bg-card p-3"
+                    >
+                      <div className="min-w-0">
+                        <div className="font-semibold truncate">{c.name}</div>
+                        <div className="text-xs text-muted-foreground">
+                          ID: {c.id}
+                        </div>
+                      </div>
+
+                      <div className="flex items-center gap-2">
+                        {onSelectCategoryId ? (
+                          <Button
+                            type="button"
+                            variant="outline"
+                            className="rounded-lg"
+                            onClick={() => {
+                              onSelectCategoryId(c.id);
+                              toast.info("Categoria selecionada", {
+                                description: c.name,
+                              });
+                            }}
+                          >
+                            Usar
+                          </Button>
+                        ) : null}
+
+                        <Button
+                          type="button"
+                          variant="outline"
+                          className="rounded-lg"
+                          onClick={() => handleDelete(c)}
+                        >
+                          Excluir
+                        </Button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </ScrollArea>
+            </>
+          )}
+        </CardContent>
+      </Card>
     </div>
   );
 }

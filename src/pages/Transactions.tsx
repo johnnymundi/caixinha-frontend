@@ -7,6 +7,21 @@ import CreateCategoryModal from "@/components/Modals/CreateCategoryModal";
 import ConfirmDialog from "@/components/Modals/ConfirmDialog";
 import { toast } from "sonner";
 
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Separator } from "@/components/ui/separator";
+import { ScrollArea } from "@/components/ui/scroll-area";
+
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+
 function ymNow() {
   const d = new Date();
   const y = d.getFullYear();
@@ -116,7 +131,7 @@ export default function TransactionsPage() {
     } catch (e: any) {
       const msg =
         e?.response?.data?.detail ?? "Verifique os campos e tente novamente.";
-      toast.error("Erro ao salvar");
+      toast.error("Erro ao salvar", { description: String(msg) });
     }
   }
 
@@ -137,216 +152,222 @@ export default function TransactionsPage() {
   }
 
   return (
-    <div className="h-[200px] p-2">
-      <section className="flex justify-between items-center gap-5">
+    <div className="space-y-6">
+      {/* topo */}
+      <section className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h2 style={{ margin: 0 }}>Transações</h2>
-          <div style={{ color: "#666" }}>
-            Entradas: <b>{money(totals.inc)}</b> • Saídas:{" "}
-            <b>{money(totals.out)}</b> • Saldo: <b>{money(totals.bal)}</b>
-          </div>
+          <h2 className="text-2xl font-semibold tracking-tight">Transações</h2>
+          <p className="text-sm text-muted-foreground">
+            Entradas: <span className="font-semibold">{money(totals.inc)}</span>{" "}
+            • Saídas: <span className="font-semibold">{money(totals.out)}</span>{" "}
+            • Saldo: <span className="font-semibold">{money(totals.bal)}</span>
+          </p>
         </div>
 
-        <div
-          style={{
-            display: "flex",
-            gap: 8,
-            alignItems: "center",
-            flexWrap: "wrap",
-          }}
-        >
-          <label style={{ display: "flex", gap: 6, alignItems: "center" }}>
-            <span>Mês</span>
-            <input
+        <div className="flex flex-wrap items-center gap-2">
+          <div className="flex items-center gap-2">
+            <Label htmlFor="month">Mês</Label>
+            <Input
+              id="month"
               type="month"
               value={month}
               onChange={(e) => setMonth(e.target.value)}
-              style={input}
+              className="w-[170px]"
             />
-          </label>
+          </div>
 
-          <select
+          <Select
             value={typeFilter}
-            onChange={(e) => setTypeFilter(e.target.value as any)}
-            style={input}
+            onValueChange={(v) => setTypeFilter(v as any)}
           >
-            <option value="ALL">Todos</option>
-            <option value="IN">Entradas</option>
-            <option value="OUT">Saídas</option>
-          </select>
+            <SelectTrigger className="w-[160px]">
+              <SelectValue placeholder="Tipo" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="ALL">Todos</SelectItem>
+              <SelectItem value="IN">Entradas</SelectItem>
+              <SelectItem value="OUT">Saídas</SelectItem>
+            </SelectContent>
+          </Select>
 
-          <select
-            value={categoryFilter}
-            onChange={(e) => setCategoryFilter(e.target.value)}
-            style={input}
-          >
-            <option value="ALL">Todas categorias</option>
-            {categories.map((c) => (
-              <option key={c.id} value={String(c.id)}>
-                {c.name}
-              </option>
-            ))}
-          </select>
+          <Select value={categoryFilter} onValueChange={setCategoryFilter}>
+            <SelectTrigger className="w-[220px]">
+              <SelectValue placeholder="Categorias" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="ALL">Todas categorias</SelectItem>
+              {categories.map((c) => (
+                <SelectItem key={c.id} value={String(c.id)}>
+                  {c.name}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
         </div>
       </section>
 
-      <section
-        style={{ display: "grid", gridTemplateColumns: "1fr 1.2fr", gap: 12 }}
-      >
-        <div style={panel}>
-          <div
-            style={{
-              display: "flex",
-              justifyContent: "space-between",
-              alignItems: "center",
-              gap: 12,
-            }}
-          >
-            <h3 style={{ marginTop: 0, marginBottom: 8 }}>Nova transação</h3>
-            <button style={btn} onClick={() => setCreateCatOpen(true)}>
-              + Categoria
-            </button>
-          </div>
+      <Separator />
 
-          <form
-            onSubmit={createTransaction}
-            style={{ display: "grid", gap: 10 }}
-          >
-            <div
-              style={{
-                display: "grid",
-                gridTemplateColumns: "1fr 1fr",
-                gap: 8,
-              }}
-            >
-              <select
-                value={form.type}
-                onChange={(e) =>
-                  setForm((f) => ({ ...f, type: e.target.value as TxType }))
-                }
-                style={input}
+      {/* grid */}
+      <section className="grid grid-cols-1 gap-3 lg:grid-cols-[1fr_1.2fr]">
+        {/* nova transação */}
+        <Card>
+          <CardHeader className="pb-3">
+            <div className="flex items-center justify-between gap-3">
+              <CardTitle className="text-base">Nova transação</CardTitle>
+              <Button
+                type="button"
+                variant="outline"
+                className="rounded-lg"
+                onClick={() => setCreateCatOpen(true)}
               >
-                <option value="IN">Entrada</option>
-                <option value="OUT">Saída</option>
-              </select>
-
-              <input
-                placeholder="Valor (ex: 35.90)"
-                value={form.amount}
-                onChange={(e) =>
-                  setForm((f) => ({ ...f, amount: e.target.value }))
-                }
-                style={input}
-              />
+                + Categoria
+              </Button>
             </div>
+          </CardHeader>
 
-            <div
-              style={{
-                display: "grid",
-                gridTemplateColumns: "1fr 1fr",
-                gap: 8,
-              }}
-            >
-              <input
-                type="date"
-                value={form.date}
-                onChange={(e) =>
-                  setForm((f) => ({ ...f, date: e.target.value }))
-                }
-                style={input}
-              />
-
-              <select
-                value={form.category}
-                onChange={(e) =>
-                  setForm((f) => ({ ...f, category: e.target.value }))
-                }
-                style={input}
-              >
-                <option value="">Sem categoria</option>
-                {categories.map((c) => (
-                  <option key={c.id} value={String(c.id)}>
-                    {c.name}
-                  </option>
-                ))}
-              </select>
-            </div>
-
-            <input
-              placeholder="Descrição (opcional)"
-              value={form.description}
-              onChange={(e) =>
-                setForm((f) => ({ ...f, description: e.target.value }))
-              }
-              style={input}
-            />
-
-            <button style={btnPrimary} type="submit">
-              Salvar
-            </button>
-          </form>
-        </div>
-
-        <div style={panel}>
-          <h3 style={{ marginTop: 0 }}>Lista</h3>
-
-          {loading ? (
-            <div style={{ color: "#666" }}>Carregando…</div>
-          ) : txs.length === 0 ? (
-            <EmptyState
-              title="Nada por aqui ainda"
-              description="Crie sua primeira transação para ver o histórico e o resumo do mês."
-              action={
-                <button
-                  style={btnPrimary}
-                  onClick={() =>
-                    window.scrollTo({ top: 0, behavior: "smooth" })
+          <CardContent>
+            <form onSubmit={createTransaction} className="space-y-3">
+              <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
+                <Select
+                  value={form.type}
+                  onValueChange={(v) =>
+                    setForm((f) => ({ ...f, type: v as TxType }))
                   }
                 >
-                  Criar transação
-                </button>
-              }
-            />
-          ) : (
-            <div style={{ display: "grid", gap: 8 }}>
-              {txs.map((t) => (
-                <div key={t.id} style={row}>
-                  <div style={{ display: "grid", gap: 4 }}>
-                    <div
-                      style={{
-                        display: "flex",
-                        gap: 10,
-                        alignItems: "center",
-                        flexWrap: "wrap",
-                      }}
-                    >
-                      <Badge type={t.type} />
-                      <b style={{ fontSize: 14 }}>{money(t.amount)}</b>
-                      <span style={{ color: "#666", fontSize: 13 }}>
-                        {t.date}
-                      </span>
-                    </div>
+                  <SelectTrigger className="w-full">
+                    <SelectValue placeholder="Tipo" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="IN">Entrada</SelectItem>
+                    <SelectItem value="OUT">Saída</SelectItem>
+                  </SelectContent>
+                </Select>
 
-                    <span style={{ color: "#666", fontSize: 13 }}>
-                      {t.category_name ?? "Sem categoria"}
-                      {t.description ? ` • ${t.description}` : ""}
-                    </span>
-                  </div>
+                <Input
+                  inputMode="decimal"
+                  placeholder="Valor (ex: 35.90)"
+                  value={form.amount}
+                  onChange={(e) =>
+                    setForm((f) => ({ ...f, amount: e.target.value }))
+                  }
+                />
+              </div>
 
-                  <button
-                    onClick={() => {
-                      setTxToDelete(t);
-                      setConfirmOpen(true);
-                    }}
-                    style={btnDanger}
+              <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
+                <Input
+                  type="date"
+                  value={form.date}
+                  onChange={(e) =>
+                    setForm((f) => ({ ...f, date: e.target.value }))
+                  }
+                />
+
+                <Select
+                  value={form.category || "NONE"}
+                  onValueChange={(v) =>
+                    setForm((f) => ({
+                      ...f,
+                      category: v === "NONE" ? "" : v,
+                    }))
+                  }
+                >
+                  <SelectTrigger className="w-full">
+                    <SelectValue placeholder="Categoria" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="NONE">Sem categoria</SelectItem>
+                    {categories.map((c) => (
+                      <SelectItem key={c.id} value={String(c.id)}>
+                        {c.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <Input
+                placeholder="Descrição (opcional)"
+                value={form.description}
+                onChange={(e) =>
+                  setForm((f) => ({ ...f, description: e.target.value }))
+                }
+              />
+
+              <Button type="submit" className="w-full rounded-lg">
+                Salvar
+              </Button>
+            </form>
+          </CardContent>
+        </Card>
+
+        {/* lista */}
+        <Card className="min-h-[420px]">
+          <CardHeader className="pb-3">
+            <CardTitle className="text-base">Lista</CardTitle>
+          </CardHeader>
+
+          <CardContent>
+            {loading ? (
+              <div className="text-sm text-muted-foreground">Carregando…</div>
+            ) : txs.length === 0 ? (
+              <EmptyState
+                title="Nada por aqui ainda"
+                description="Crie sua primeira transação para ver o histórico e o resumo do mês."
+                action={
+                  <Button
+                    className="rounded-lg"
+                    onClick={() =>
+                      window.scrollTo({ top: 0, behavior: "smooth" })
+                    }
                   >
-                    Excluir
-                  </button>
+                    Criar transação
+                  </Button>
+                }
+              />
+            ) : (
+              <ScrollArea className="h-[520px] pr-2">
+                <div className="space-y-2">
+                  {txs.map((t) => (
+                    <div
+                      key={t.id}
+                      className="flex items-center justify-between gap-3 rounded-xl border bg-card p-3"
+                    >
+                      <div className="space-y-1">
+                        <div className="flex flex-wrap items-center gap-2">
+                          <Badge type={t.type} />
+                          <span className="text-sm font-semibold">
+                            {money(t.amount)}
+                          </span>
+                          <span className="text-xs text-muted-foreground">
+                            {t.date}
+                          </span>
+                        </div>
+
+                        <div className="text-sm text-muted-foreground">
+                          {t.category_name ?? "Sem categoria"}
+                          {t.description ? ` • ${t.description}` : ""}
+                        </div>
+                      </div>
+
+                      <Button
+                        type="button"
+                        variant="outline"
+                        className="rounded-lg"
+                        onClick={() => {
+                          setTxToDelete(t);
+                          setConfirmOpen(true);
+                        }}
+                      >
+                        Excluir
+                      </Button>
+                    </div>
+                  ))}
                 </div>
-              ))}
-            </div>
-          )}
-        </div>
+              </ScrollArea>
+            )}
+          </CardContent>
+        </Card>
       </section>
 
       <CreateCategoryModal
@@ -354,11 +375,9 @@ export default function TransactionsPage() {
         onClose={() => setCreateCatOpen(false)}
         onCreated={(cat) => {
           setCategories((prev) => {
-            // evita duplicar
             if (prev.some((x) => x.id === cat.id)) return prev;
             return [...prev, cat].sort((a, b) => a.name.localeCompare(b.name));
           });
-          // seleciona a nova categoria no form
           setForm((f) => ({ ...f, category: String(cat.id) }));
           toast.success("Categoria criada!");
         }}
@@ -369,7 +388,9 @@ export default function TransactionsPage() {
         title="Excluir transação?"
         description={
           txToDelete
-            ? `Você vai excluir ${txToDelete.type === "IN" ? "uma entrada" : "uma saída"} de ${money(txToDelete.amount)} (${txToDelete.date}).`
+            ? `Você vai excluir ${
+                txToDelete.type === "IN" ? "uma entrada" : "uma saída"
+              } de ${money(txToDelete.amount)} (${txToDelete.date}).`
             : undefined
         }
         confirmText="Excluir"
@@ -385,53 +406,3 @@ export default function TransactionsPage() {
     </div>
   );
 }
-
-const panel: React.CSSProperties = {
-  border: "1px solid #eee",
-  borderRadius: 12,
-  padding: 12,
-  background: "white",
-  overflowY: "auto",
-  height: "100%",
-};
-
-const row: React.CSSProperties = {
-  display: "flex",
-  justifyContent: "space-between",
-  alignItems: "center",
-  gap: 12,
-  border: "1px solid #f0f0f0",
-  borderRadius: 12,
-  padding: 12,
-  background: "#fff",
-};
-
-const input: React.CSSProperties = {
-  padding: 10,
-  borderRadius: 10,
-  border: "1px solid #ddd",
-  outline: "none",
-};
-
-const btn: React.CSSProperties = {
-  padding: "10px 12px",
-  borderRadius: 10,
-  border: "1px solid #e5e5e5",
-  background: "#fff",
-  cursor: "pointer",
-};
-
-const btnPrimary: React.CSSProperties = {
-  ...btn,
-  border: "1px solid #000",
-  background: "#000",
-  color: "#fff",
-};
-
-const btnDanger: React.CSSProperties = {
-  padding: "8px 10px",
-  borderRadius: 10,
-  border: "1px solid #e5e5e5",
-  background: "#fff",
-  cursor: "pointer",
-};

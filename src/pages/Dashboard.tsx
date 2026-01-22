@@ -4,6 +4,12 @@ import type { Summary, Transaction } from "@/@types/types";
 import EmptyState from "../components/EmptyState";
 import Badge from "@/components/Badge";
 
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Separator } from "@/components/ui/separator";
+
 function ymNow() {
   const d = new Date();
   const y = d.getFullYear();
@@ -14,6 +20,21 @@ function ymNow() {
 function money(v: string | number) {
   const n = typeof v === "number" ? v : Number(v);
   return n.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
+}
+
+function StatCard({ title, value }: { title: string; value: string }) {
+  return (
+    <Card>
+      <CardHeader className="pb-2">
+        <CardTitle className="text-sm font-medium text-muted-foreground">
+          {title}
+        </CardTitle>
+      </CardHeader>
+      <CardContent>
+        <div className="text-2xl font-semibold tracking-tight">{value}</div>
+      </CardContent>
+    </Card>
+  );
 }
 
 export default function Dashboard() {
@@ -50,7 +71,6 @@ export default function Dashboard() {
       }))
       .sort((a, b) => b.total - a.total);
 
-    // top 5
     return out.slice(0, 5);
   }, [summary]);
 
@@ -59,181 +79,136 @@ export default function Dashboard() {
   }, [topOutCategories]);
 
   return (
-    <div className="p-2 m-auto">
-      <section className="flex justify-between items-center gap-6">
+    <div className="space-y-6">
+      <section className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h2 className="m-0">Dashboard</h2>
-          <div className="text-gray-600">Resumo do mês</div>
+          <h2 className="text-2xl font-semibold tracking-tight">Dashboard</h2>
+          <p className="text-sm text-muted-foreground">Resumo do mês</p>
         </div>
 
-        <label className="flex gap-4 items-center">
-          <span>Mês</span>
-          <input
+        <div className="flex items-center gap-3">
+          <Label htmlFor="month" className="text-sm">
+            Mês
+          </Label>
+          <Input
+            id="month"
             type="month"
             value={month}
             onChange={(e) => setMonth(e.target.value)}
-            style={{ padding: 8, borderRadius: 10, border: "1px solid #ddd" }}
+            className="w-42.5"
           />
-        </label>
+        </div>
       </section>
 
-      <section
-        style={{
-          display: "grid",
-          gridTemplateColumns: "repeat(4, 1fr)",
-          gap: 12,
-        }}
-      >
-        <Card title="Entradas" value={summary ? money(summary.income) : "—"} />
-        <Card title="Saídas" value={summary ? money(summary.expense) : "—"} />
-        <Card
+      <section className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
+        <StatCard
+          title="Entradas"
+          value={summary ? money(summary.income) : "—"}
+        />
+        <StatCard
+          title="Saídas"
+          value={summary ? money(summary.expense) : "—"}
+        />
+        <StatCard
           title="Saldo do mês"
           value={summary ? money(summary.balance_month) : "—"}
         />
-        <Card
+        <StatCard
           title="Saldo total"
           value={summary ? money(summary.balance_total) : "—"}
         />
       </section>
 
-      <section
-        style={{ display: "grid", gridTemplateColumns: "1.2fr 1fr", gap: 12 }}
-      >
-        <div style={panel}>
-          <h3 style={{ marginTop: 0 }}>Últimas transações</h3>
+      <Separator />
 
-          {loading && recent.length === 0 ? (
-            <div style={{ color: "#666" }}>Carregando…</div>
-          ) : recent.length === 0 ? (
-            <EmptyState
-              title="Sem transações ainda"
-              description="Crie uma transação na aba Transações para preencher seu histórico."
-              action={
-                <a href="/transactions" style={linkBtn}>
-                  Ir para Transações
-                </a>
-              }
-            />
-          ) : (
-            <div style={{ display: "grid", gap: 8 }}>
-              {recent.map((t) => (
-                <div key={t.id} style={row}>
-                  <div style={{ display: "grid", gap: 4 }}>
-                    <div
-                      style={{
-                        display: "flex",
-                        gap: 10,
-                        alignItems: "center",
-                        flexWrap: "wrap",
-                      }}
-                    >
+      <section className="grid grid-cols-1 gap-3 lg:grid-cols-[1.2fr_1fr]">
+        <Card>
+          <CardHeader className="pb-3">
+            <CardTitle className="text-base">Últimas transações</CardTitle>
+          </CardHeader>
+
+          <CardContent className="space-y-3">
+            {loading && recent.length === 0 ? (
+              <div className="text-sm text-muted-foreground">Carregando…</div>
+            ) : recent.length === 0 ? (
+              <EmptyState
+                title="Sem transações ainda"
+                description="Crie uma transação na aba Transações para preencher seu histórico."
+                action={
+                  <Button asChild className="rounded-lg">
+                    <a href="/transactions">Ir para Transações</a>
+                  </Button>
+                }
+              />
+            ) : (
+              <div className="space-y-2">
+                {recent.map((t) => (
+                  <div key={t.id} className="rounded-xl border bg-card p-3">
+                    <div className="flex flex-wrap items-center gap-2">
                       <Badge type={t.type} />
-                      <b style={{ fontSize: 14 }}>{money(t.amount)}</b>
-                      <span style={{ color: "#666", fontSize: 13 }}>
+                      <span className="text-sm font-semibold">
+                        {money(t.amount)}
+                      </span>
+                      <span className="text-xs text-muted-foreground">
                         {t.date}
                       </span>
                     </div>
-                    <span style={{ color: "#666", fontSize: 13 }}>
+
+                    <div className="mt-1 text-sm text-muted-foreground">
                       {t.category_name ?? "Sem categoria"}
                       {t.description ? ` • ${t.description}` : ""}
-                    </span>
-                  </div>
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
-
-        <div style={panel}>
-          <h3 style={{ marginTop: 0 }}>Top categorias (saídas)</h3>
-
-          {!summary ? (
-            <div style={{ color: "#666" }}>—</div>
-          ) : topOutCategories.length === 0 ? (
-            <EmptyState
-              title="Nada para analisar ainda"
-              description="Quando você tiver saídas categorizadas, o top aparecerá aqui."
-            />
-          ) : (
-            <div style={{ display: "grid", gap: 10 }}>
-              {topOutCategories.map((x) => {
-                const pct = maxTop > 0 ? (x.total / maxTop) * 100 : 0;
-                return (
-                  <div key={x.name} style={{ display: "grid", gap: 6 }}>
-                    <div
-                      style={{
-                        display: "flex",
-                        justifyContent: "space-between",
-                        gap: 12,
-                      }}
-                    >
-                      <span style={{ fontWeight: 700 }}>{x.name}</span>
-                      <span style={{ color: "#111", fontWeight: 800 }}>
-                        {money(x.total)}
-                      </span>
-                    </div>
-
-                    <div
-                      style={{
-                        height: 10,
-                        borderRadius: 999,
-                        background: "#f2f2f2",
-                        overflow: "hidden",
-                        border: "1px solid #eee",
-                      }}
-                    >
-                      <div
-                        style={{
-                          height: "100%",
-                          width: `${pct}%`,
-                          borderRadius: 999,
-                          background: "#111", // sem libs/tema, simples
-                        }}
-                      />
                     </div>
                   </div>
-                );
-              })}
-              <div style={{ color: "#666", fontSize: 12 }}>
-                (Barra relativa ao maior gasto do mês)
+                ))}
               </div>
-            </div>
-          )}
-        </div>
+            )}
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader className="pb-3">
+            <CardTitle className="text-base">Top categorias (saídas)</CardTitle>
+          </CardHeader>
+
+          <CardContent className="space-y-3">
+            {!summary ? (
+              <div className="text-sm text-muted-foreground">—</div>
+            ) : topOutCategories.length === 0 ? (
+              <EmptyState
+                title="Nada para analisar ainda"
+                description="Quando você tiver saídas categorizadas, o top aparecerá aqui."
+              />
+            ) : (
+              <div className="space-y-3">
+                {topOutCategories.map((x) => {
+                  const pct = maxTop > 0 ? (x.total / maxTop) * 100 : 0;
+                  return (
+                    <div key={x.name} className="space-y-2">
+                      <div className="flex items-center justify-between gap-3">
+                        <span className="text-sm font-medium">{x.name}</span>
+                        <span className="text-sm font-semibold">
+                          {money(x.total)}
+                        </span>
+                      </div>
+
+                      <div className="h-2 w-full overflow-hidden rounded-full bg-muted">
+                        <div
+                          className="h-full rounded-full bg-primary transition-[width]"
+                          style={{ width: `${pct}%` }}
+                        />
+                      </div>
+                    </div>
+                  );
+                })}
+
+                <p className="text-xs text-muted-foreground">
+                  (Barra relativa ao maior gasto do mês)
+                </p>
+              </div>
+            )}
+          </CardContent>
+        </Card>
       </section>
     </div>
   );
 }
-
-const panel: React.CSSProperties = {
-  border: "1px solid #eee",
-  borderRadius: 12,
-  padding: 12,
-  background: "white",
-};
-
-const row: React.CSSProperties = {
-  border: "1px solid #f0f0f0",
-  borderRadius: 12,
-  padding: 12,
-  background: "#fff",
-};
-
-function Card({ title, value }: { title: string; value: string }) {
-  return (
-    <div style={panel}>
-      <div style={{ color: "#666", fontSize: 14 }}>{title}</div>
-      <div style={{ fontSize: 22, fontWeight: 800, marginTop: 6 }}>{value}</div>
-    </div>
-  );
-}
-
-const linkBtn: React.CSSProperties = {
-  display: "inline-block",
-  padding: "10px 12px",
-  borderRadius: 10,
-  border: "1px solid #000",
-  background: "#000",
-  color: "#fff",
-  textDecoration: "none",
-};
