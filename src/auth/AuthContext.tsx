@@ -1,5 +1,5 @@
 import { createContext, useContext, useEffect, useMemo, useState } from "react";
-import { api } from "@/services/api";
+import { api, applyToken } from "@/services/api";
 import { toast } from "sonner";
 
 type User = {
@@ -8,6 +8,7 @@ type User = {
   username: string;
   first_name?: string | null;
   last_name?: string | null;
+  access: string;
 };
 
 type AuthContextType = {
@@ -47,6 +48,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         email,
         password,
       });
+      applyToken(res.data.access);
       setUser(res.data.user);
       toast.success("Bem-vindo!");
     } catch (e: any) {

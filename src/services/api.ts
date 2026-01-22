@@ -1,6 +1,19 @@
 import axios from "axios";
 
 export const api = axios.create({
-  baseURL: import.meta.env.VITE_API_URL ?? "http://127.0.0.1:8000/api",
-  withCredentials: true, // para os cookies cookinhos
+  baseURL: "http://localhost:8000/api",
+  withCredentials: true,
 });
+
+export function applyToken(token: string | null) {
+  if (token) {
+    api.defaults.headers.common.Authorization = `Bearer ${token}`;
+    localStorage.setItem("access_token", token);
+  } else {
+    delete api.defaults.headers.common.Authorization;
+    localStorage.removeItem("access_token");
+  }
+}
+
+// aplica ao iniciar (refresh)
+applyToken(localStorage.getItem("access_token"));
