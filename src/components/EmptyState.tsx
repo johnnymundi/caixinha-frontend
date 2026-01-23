@@ -8,21 +8,14 @@ export default function EmptyState({
   action?: React.ReactNode;
 }) {
   return (
-    <div
-      style={{
-        border: "1px dashed #ddd",
-        borderRadius: 14,
-        padding: 16,
-        background: "#fafafa",
-        display: "grid",
-        gap: 6,
-      }}
-    >
-      <div style={{ fontWeight: 800, fontSize: 14 }}>{title}</div>
+    <div className="grid gap-2 rounded-xl border border-dashed bg-muted/30 p-4">
+      <div className="text-sm font-semibold">{title}</div>
+
       {description ? (
-        <div style={{ color: "#666", fontSize: 13 }}>{description}</div>
+        <p className="text-sm text-muted-foreground">{description}</p>
       ) : null}
-      {action ? <div style={{ marginTop: 6 }}>{action}</div> : null}
+
+      {action ? <div className="pt-2">{action}</div> : null}
     </div>
   );
 }

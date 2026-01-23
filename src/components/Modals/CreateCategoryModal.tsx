@@ -1,29 +1,18 @@
 import { useMemo, useState } from "react";
-import Modal from "@/components/Modals/Modal";
 import { api } from "@/services/api";
 import type { Category } from "@/@types/types";
 
-const input: React.CSSProperties = {
-  padding: 10,
-  borderRadius: 10,
-  border: "1px solid #ddd",
-  outline: "none",
-};
-
-const btn: React.CSSProperties = {
-  padding: "10px 12px",
-  borderRadius: 10,
-  border: "1px solid #e5e5e5",
-  background: "#fff",
-  cursor: "pointer",
-};
-
-const btnPrimary: React.CSSProperties = {
-  ...btn,
-  border: "1px solid #000",
-  background: "#000",
-  color: "#fff",
-};
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 
 export default function CreateCategoryModal({
   open,
@@ -54,7 +43,6 @@ export default function CreateCategoryModal({
       setName("");
       onClose();
     } catch (e: any) {
-      // DRF costuma mandar { name: ["..."] } ou detail
       const msg =
         e?.response?.data?.name?.[0] ??
         e?.response?.data?.detail ??
@@ -65,55 +53,61 @@ export default function CreateCategoryModal({
     }
   }
 
+  function handleOpenChange(nextOpen: boolean) {
+    // impede fechar enquanto está salvando
+    if (!nextOpen && saving) return;
+    if (!nextOpen) onClose();
+  }
+
   return (
-    <Modal
-      open={open}
-      title="Nova categoria"
-      onClose={() => {
-        if (!saving) onClose();
-      }}
-      footer={
-        <>
-          <button style={btn} onClick={onClose} disabled={saving}>
-            Cancelar
-          </button>
-          <button style={btnPrimary} onClick={save} disabled={!canSave}>
-            {saving ? "Salvando…" : "Criar"}
-          </button>
-        </>
-      }
-    >
-      <div style={{ display: "grid", gap: 10 }}>
-        <label style={{ display: "grid", gap: 6 }}>
-          <span style={{ fontSize: 13, fontWeight: 700 }}>Nome</span>
-          <input
-            autoFocus
-            placeholder="Ex: Alimentação"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            style={input}
-          />
-        </label>
+    <Dialog open={open} onOpenChange={handleOpenChange}>
+      <DialogContent className="sm:max-w-[420px]">
+        <DialogHeader>
+          <DialogTitle>Nova categoria</DialogTitle>
+          <DialogDescription>
+            Crie uma categoria para organizar suas transações.
+          </DialogDescription>
+        </DialogHeader>
 
-        {error ? (
-          <div
-            style={{
-              color: "#991b1b",
-              background: "#fee2e2",
-              border: "1px solid #fecaca",
-              borderRadius: 10,
-              padding: 10,
-            }}
-          >
-            {error}
+        <div className="grid gap-3">
+          <div className="grid gap-2">
+            <Label htmlFor="category-name">Nome</Label>
+            <Input
+              id="category-name"
+              autoFocus
+              placeholder="Ex: Alimentação"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              disabled={saving}
+            />
           </div>
-        ) : null}
 
-        <div style={{ color: "#666", fontSize: 13 }}>
-          Dica: use nomes curtos e consistentes (ex: “Casa”, “Mercado”,
-          “Transporte”).
+          {error ? (
+            <div className="rounded-lg border border-destructive/30 bg-destructive/10 px-3 py-2 text-sm text-destructive">
+              {error}
+            </div>
+          ) : null}
+
+          <p className="text-sm text-muted-foreground">
+            Dica: use nomes curtos e consistentes (ex: “Casa”, “Mercado”,
+            “Transporte”).
+          </p>
         </div>
-      </div>
-    </Modal>
+
+        <DialogFooter className="gap-2 sm:gap-2">
+          <Button
+            type="button"
+            variant="outline"
+            onClick={onClose}
+            disabled={saving}
+          >
+            Cancelar
+          </Button>
+          <Button type="button" onClick={save} disabled={!canSave}>
+            {saving ? "Salvando…" : "Criar"}
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
   );
 }

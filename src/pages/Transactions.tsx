@@ -21,6 +21,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { normalizeBRLAmount } from "@/lib/normalizeAmout";
 
 function ymNow() {
   const d = new Date();
@@ -116,9 +117,16 @@ export default function TransactionsPage() {
   async function createTransaction(e: React.FormEvent) {
     e.preventDefault();
     try {
+      const normalized = normalizeBRLAmount(form.amount);
+
+      if (!normalized || Number.isNaN(Number(normalized))) {
+        toast.error("Valor inválido", { description: "Use algo como 10,99" });
+        return;
+      }
+
       const payload: any = {
         type: form.type,
-        amount: form.amount,
+        amount: normalized,
         date: form.date,
         description: form.description,
         category: form.category ? Number(form.category) : null,
@@ -314,16 +322,6 @@ export default function TransactionsPage() {
               <EmptyState
                 title="Nada por aqui ainda"
                 description="Crie sua primeira transação para ver o histórico e o resumo do mês."
-                action={
-                  <Button
-                    className="rounded-lg"
-                    onClick={() =>
-                      window.scrollTo({ top: 0, behavior: "smooth" })
-                    }
-                  >
-                    Criar transação
-                  </Button>
-                }
               />
             ) : (
               <ScrollArea className="h-[520px] pr-2">

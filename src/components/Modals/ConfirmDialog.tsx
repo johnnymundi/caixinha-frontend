@@ -1,4 +1,5 @@
 import Modal from "@/components/Modals/Modal";
+import { Button } from "../ui/button";
 
 const btn: React.CSSProperties = {
   padding: "10px 12px",
@@ -43,12 +44,12 @@ export default function ConfirmDialog({
       }}
       footer={
         <>
-          <button style={btn} onClick={onClose} disabled={busy}>
+          <Button onClick={onClose} disabled={busy}>
             {cancelText}
-          </button>
-          <button style={btnDanger} onClick={onConfirm} disabled={busy}>
+          </Button>
+          <Button variant={"destructive"} onClick={onConfirm} disabled={busy}>
             {busy ? "Aguarde…" : confirmText}
-          </button>
+          </Button>
         </>
       }
     >
